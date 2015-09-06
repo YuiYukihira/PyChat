@@ -1,7 +1,23 @@
 import socket, threading, rsa
 from Crypto.Cipher import AES
 from tkinter import *, ttk
-        
+from time import sleep
+
+
+class GetMessage(threading.Thread):
+    def __init__(self, *args):
+        threading.Thread.__init__(self)
+        self.text = ''
+
+    def run(self):
+        while True:
+            try:
+                self.text += s.recv(1024).decode('utf-8') + '\n')
+            except:
+                sleep(0.1)
+            finally:
+                self.chat.set(self.text)
+
 class GUI(threading.Thread):
     def __init__(self, *args):
         threading.Thread.__init__(self)
@@ -35,6 +51,5 @@ class GUI(threading.Thread):
         toSend = self.Msg.get()
         Space = if toSend == ' '*len(toSend): True else: False
         if toSend != '' and Space == False:
-            self.s.send(text.encode('utf-8'))
+            self.s.send((self.Name+': '+toSend).encode('utf-8'))
             self.Msg.set('')
-            
