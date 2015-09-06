@@ -20,9 +20,11 @@ class Client:
         self.cPubicKey, self.cPrivateKey = rsa.newkeys(1024)
         self.s.send(pickle.dumps(self.cPublicKey))
         self.sPublicKey = pickle.loads(self.s.revc(1024))
-        self.TestMsgc = rsa.encrypt(self.Name, self.sPublicKey)
-        self.TestMsgc  =rsa.sign(self.TestMsgc, self.cPrivateKey)
+
+        self.TestMsgc = rsa.encrypt(self.Name.encode('utf-8'), self.sPublicKey)
+        self.TestMsgcS  =rsa.sign(self.TestMsgc, self.cPrivateKey)
         self.s.send(self.TestMsgc)
+        self.s.send(
 
         self.TestMsgs = self.s.recv(1024)
         if self.TestMsgs.decode('utf-8') == 'Failed':
