@@ -120,3 +120,5 @@ class GUI(threading.Thread):
             self.s.send((self.Name+': '+toSend).encode('utf-8'))
             self.Msg.set('')
 
+if __name__ == '__main__':
+    testClient = Client(host='127.0.0.1', port=5000, name='Yui')
