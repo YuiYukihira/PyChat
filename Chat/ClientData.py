@@ -29,6 +29,9 @@ class Namer(threading.Thread):
         self.root.bind('<Return>', Setname)
 
         self.root.mainloop()
+
+    def SetName(*args):
+        self.Name = name.get()
         
 class GetMessage(threading.Thread):
     def __init__(self, *args):
