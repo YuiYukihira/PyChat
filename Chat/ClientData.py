@@ -1,8 +1,43 @@
-import socket, threading, rsa
+import socket, threading, rsa, pickle
 from Crypto.Cipher import AES
 from tkinter import *, ttk
 from time import sleep
 
+class Client:
+    def __init__(self, *args=(host='127.0.0.1', port=5000, name=None)):
+        self.s = socket.socket()
+        self.server = (host, port)
+        if name == None:
+            self.namer1 = Namer(self)
+            self.namer1.start()
+        else:
+            self.Name = name
+        self.GUI1 = GUI(self)
+        self.GM1 = GetMessage(self)
+        
+    def start(self):
+        self.s.connect(self.server)
+        self.cPubicKey, self.cPrivateKey = rsa.newkeys(1024)
+        self.s.send(pickle.dumps(self.cPublicKey))
+        self.sPublicKey = pickle.loads(self.s.revc(1024))
+        self.TestMsgc = rsa.encrypt(self.Name, self.sPublicKey)
+        self.TestMsgc  =rsa.sign(self.TestMsgc, self.cPrivateKey)
+        self.s.send(self.TestMsgc)
+
+        self.TestMsgs = self.s.recv(1024)
+        if self.TestMsgs.decode('utf-8') == 'Failed':
+            self.s.close()
+            self.start() #If athentication fails the client will for now restart.
+        else:
+            if rsa.verify(self.TestMsgs, self.sPublicKey):
+                self.s.send('Passed'.encode('utf-8'))
+                self.GUI1.start()
+                self.GM1.start()
+            else:
+                self.s.send('Failed'.encode('utf-8'))
+                self.s.close()
+                self.start() #If athentication fails the client will for now restart.
+        
 class Namer(threading.Thread):
     def __init__(self, *args):
         threading.Thread.__init__(self)
@@ -84,3 +119,4 @@ class GUI(threading.Thread):
         if toSend != '' and Space == False:
             self.s.send((self.Name+': '+toSend).encode('utf-8'))
             self.Msg.set('')
+
