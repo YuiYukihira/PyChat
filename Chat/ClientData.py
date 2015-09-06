@@ -31,4 +31,10 @@ class GUI(threading.Thread):
 
         self.root.bind('<Return>', self.SendMessage)
 
+    def SendMessage():
+        toSend = self.Msg.get()
+        Space = if toSend == ' '*len(toSend): True else: False
+        if toSend != '' and Space == False:
+            self.s.send(text.encode('utf-8'))
+            self.Msg.set('')
             
