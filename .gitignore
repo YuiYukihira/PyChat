@@ -99,3 +99,17 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+*.h
+venv/Scripts/activate
+*.bat
+venv/Scripts/activate.ps1
+venv/Scripts/activate_this.py
+venv/Scripts/easy_install-3.4.exe
+venv/Scripts/easy_install.exe
+venv/Scripts/pip.exe
+venv/Scripts/pip3.4.exe
+venv/Scripts/pip3.exe
+venv/Scripts/python.exe
+venv/Scripts/python34.dll
+venv/Scripts/pythonw.exe
+venv/Scripts/wheel.exe
