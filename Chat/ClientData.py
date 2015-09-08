@@ -1,10 +1,19 @@
-import socket, threading, rsa, pickle
-from Crypto.Cipher import AES
-from tkinter import *, ttk
+import socket, threading, pickle, os
+from tkinter import *
+from tkinter import ttk
 from time import sleep
+import importlib
+
+rsa_loader = importlib.find_loader('rsa')
+found_rsa = rsa_loader is not None
+if found_rsa == False:
+    os.system('C:\Python34\Scripts\easy_install rsa')
+
+from Crypto.Cipher import AES
+import rsa
 
 class Client:
-    def __init__(self, *args=(host='127.0.0.1', port=5000, name=None)):
+    def __init__(self, host='127.0.0.1', port=5000, name=None):
         self.s = socket.socket()
         self.server = (host, port)
         if name == None:
@@ -22,12 +31,14 @@ class Client:
         self.sPublicKey = pickle.loads(self.s.revc(1024))
 
         self.TestMsgc = rsa.encrypt(self.Name.encode('utf-8'), self.sPublicKey)
-        self.TestMsgcS  =rsa.sign(self.TestMsgc, self.cPrivateKey)
+        self.TestMsgcS = rsa.sign(self.TestMsgc, self.cPrivateKey)
         self.s.send(self.TestMsgc)
-        self.s.send(
+        self.s.send(TestMsgcS)
+        if self.s.recv(1024).decode('utf-8') == 'Failed':
+            self.s.close()
 
         self.TestMsgs = self.s.recv(1024)
-        if self.TestMsgs.decode('utf-8') == 'Failed':
+        if rsa.verify(self.TestMsgs, self.sPublicKey) :
             self.s.close()
             self.start() #If athentication fails the client will for now restart.
         else:
