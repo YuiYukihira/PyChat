@@ -20,8 +20,16 @@ class Getconnections(threading.Thread):
         self.c.send(pickle.dumps(self.sPublicKey))
 
         self.TestMsgc = self.c.recv(1024)
-        if not rsa.verify(self.TestMsgc, self.cPublicKey):
+        self.TestMsgcS = self.c.recv(1024)
+        if not rsa.verify(self.TestMsgcS, self.cPublicKey):
             self.c.send('Failed'.encode('utf-8'))
             self.c.close()
         else:
-            self.name = 
+            self.TempName = rsa.decrypt(self.TestMsgc, self.sPrivateKey).decode('utf-8')
+
+            self.TestMsgs = rsa.encrypt('Hello'.encode('utf-8'), self.cPublicKey)
+            self.TestMsgs = rsa.sign(self.TestMsgs, self.sPrivateKey)
+            self.TestMsgs = self.c.revc(1024).decode('utf-8')
+            if self.Msgs == 'Failed':
+                self.c.close()
+            
