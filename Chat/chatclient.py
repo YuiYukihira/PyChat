@@ -57,7 +57,7 @@ class GUI(threading.Thread):
         chat = StringVar()
         Msg = StringVar()
 
-        ttk.Label(self.mainframe, textvariable=chat).grid(column=1, row=1, sticky=(N, W, E, S))
+        ttk.Label(self.mainframe, textvariable=chat, wraplength=50).grid(column=1, row=1, sticky=(N, W, E, S))
 
         ttk.Button(self.mainframe, text="Send Message:", command=SendMessage).grid(column=1, row=2, sticky=(W, E, S))
         Msg_entry = ttk.Entry(self.mainframe, width=20, textvariable=Msg).grid(column=2, row=2, sticky=(W, E, S))
