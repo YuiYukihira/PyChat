@@ -14,8 +14,7 @@ def SendData(c, data):
     except ConnectionResetError:
         for i in Clients:
             if Clients[i][1] == c:
-                key = Clients[i]
-        del Clients[key]
+                del Clients[i]
         c.close()
 
 
@@ -26,8 +25,7 @@ def RecvData(c, buffer):
     except ConnectionResetError:
         for i in Clients:
             if Clients[i][1] == c:
-                key = Clients[i]
-        del Clients[key]
+                del Clients[i]
         c.close()
 
 
