@@ -3,7 +3,7 @@ from Crypto.Cipher import AES
 
 class Getconnections(threading.Thread):
     def __init__(self):
-        threading.Thread.__init__(self, *args=(self))
+        threading.Thread.__init__(self, *args)
         self.name = ''
         self.c = ''
         self. addr = ''
@@ -32,4 +32,3 @@ class Getconnections(threading.Thread):
             self.TestMsgs = self.c.revc(1024).decode('utf-8')
             if self.Msgs == 'Failed':
                 self.c.close()
-            
