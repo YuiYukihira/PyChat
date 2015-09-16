@@ -3,14 +3,15 @@ from time import sleep
 from tkinter import *
 from tkinter import ttk
 
+
 class Namer(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         sleep(0.1)
-        
+
     def Quit(self):
         self.namer.destroy()
-        
+
     def run(self):
         global name
         self.namer = Tk()
@@ -19,11 +20,11 @@ class Namer(threading.Thread):
         self.nameframe = ttk.Frame(self.namer, padding='3 3 3 3')
         self.nameframe.grid(column=0, row=0, sticky=(N, W, E, S))
         self.nameframe.columnconfigure(0, weight=1)
-        self.nameframe.rowconfigure(0,  weight=1)
+        self.nameframe.rowconfigure(0, weight=1)
 
         name = StringVar()
 
-        ttk.Button(self.nameframe, text="Confirm name:", command=SetName).grid(column=1, row=1, sticky=(N,W,E, S))
+        ttk.Button(self.nameframe, text="Confirm name:", command=SetName).grid(column=1, row=1, sticky=(N, W, E, S))
         Name_entry = ttk.Entry(self.nameframe, width=7, textvariable=name).grid(column=2, row=1, sticky=(N, W, E, S))
 
         for child in self.nameframe.winfo_children(): child.grid_configure(padx=5, pady=5)
@@ -31,15 +32,16 @@ class Namer(threading.Thread):
         self.namer.bind('<Return>', SetName)
 
         self.namer.mainloop()
-        
+
+
 class GUI(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         sleep(0.1)
-        
+
     def Quit(self):
         self.root.destroy()
-        
+
     def run(self):
         global chat
         global Msg
@@ -66,12 +68,15 @@ class GUI(threading.Thread):
 
         self.root.mainloop()
 
+
 class NamingError(Exception):
     def __init__(self, name, check):
         self.name = name
         self.check = check
+
     def __str__(self):
         return repr(self.name), repr(self.check)
+
 
 class GetMessage(threading.Thread):
     def __init__(self):
@@ -87,13 +92,16 @@ class GetMessage(threading.Thread):
                 sleep(0.1)
             chat.set(self.text)
 
+
 def SendMessage(*args):
-        text = Name + ': ' + Msg.get()
-        print('sending: ' + text)
-        s.send(text.encode('utf-8'))
-        Msg.set('')
+    text = Name + ': ' + Msg.get()
+    print('sending: ' + text)
+    s.send(text.encode('utf-8'))
+    Msg.set('')
+
 
 def SetName(*args):
+    global Name
     s.connect((host, port))
     HndSkMsg = s.recv(1024).decode('utf-8')
     Name = name.get()
@@ -108,18 +116,20 @@ def SetName(*args):
             try:
                 raise NamingError(name, check)
             except NamingError as e:
-                print('Naming Error: First value is what was sent to server, Second is what came back. The two must match.\nNames: ' + repr(e.name) + ' & ' + repr(e.check))
+                print(
+                    'Naming Error: First value is what was sent to server, Second is what came back. The two must match.\nNames: ' + repr(
+                        e.name) + ' & ' + repr(e.check))
                 sleep(5)
                 print('restarting')
                 Main()
     else:
-        print('An error occured in handshaking...restarting')
+        print('An error occurred in handshaking...restarting')
         Main()
 
- 
-                   
+
 def Main():
     NR1.start()
+
 
 if __name__ == '__main__':
     Name = ''

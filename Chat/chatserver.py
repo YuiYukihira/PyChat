@@ -1,10 +1,12 @@
 import socket, threading
 
+
 def GetName(c):
     SendData(c, 'NameTime')
     name = RecvData(c, 1024)
     SendData(c, name)
     return name
+
 
 def SendData(c, data):
     try:
@@ -15,7 +17,8 @@ def SendData(c, data):
                 key = Clients[i]
         del Clients[key]
         c.close()
-        
+
+
 def RecvData(c, buffer):
     try:
         data = c.recv(buffer).decode('utf-8')
@@ -26,6 +29,7 @@ def RecvData(c, buffer):
                 key = Clients[i]
         del Clients[key]
         c.close()
+
 
 class GetConnections(threading.Thread):
     def __init__(self):
@@ -41,6 +45,7 @@ class GetConnections(threading.Thread):
             self.name = GetName(self.c)
             Clients[self.name] = [False, self.c]
 
+
 class Listener(threading.Thread):
     def __init__(self, c):
         threading.Thread.__init__(self)
@@ -52,6 +57,7 @@ class Listener(threading.Thread):
         while True:
             self.text = RecvData(self.c, 1024)
             self.posted = False
+
 
 class CreateListeners(threading.Thread):
     def __init__(self):
@@ -73,6 +79,7 @@ class CreateListeners(threading.Thread):
             except:
                 self.run()
 
+
 class PostMessages(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -86,8 +93,9 @@ class PostMessages(threading.Thread):
                     text = Listeners[i].text
                     Listeners[i].posted = True
             for i in Clients:
-                 if text != '':
+                if text != '':
                     SendData(Clients[i][1], text)
+
 
 def Main():
     GConns1 = GetConnections()
@@ -96,7 +104,8 @@ def Main():
     GConns1.start()
     CL1.start()
     PM1.start()
-    
+
+
 if __name__ == '__main__':
     text = ''
     Listeners = {}
@@ -105,5 +114,5 @@ if __name__ == '__main__':
     Clients = {}
     DisconnectionLock = threading.Lock()
     s = socket.socket()
-    s.bind((host,port))
+    s.bind((host, port))
     Main()
