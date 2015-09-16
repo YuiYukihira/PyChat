@@ -57,7 +57,7 @@ class GUI(threading.Thread):
         chat = StringVar()
         Msg = StringVar()
 
-        ttk.Label(self.mainframe, textvariable=chat, wraplength=50).grid(column=1, row=1, sticky=(N, W, E, S))
+        ttk.Label(self.mainframe, textvariable=chat, wraplength=500).grid(column=1, row=1, sticky=(N, W, E, S))
 
         ttk.Button(self.mainframe, text="Send Message:", command=SendMessage).grid(column=1, row=2, sticky=(W, E, S))
         Msg_entry = ttk.Entry(self.mainframe, width=20, textvariable=Msg).grid(column=2, row=2, sticky=(W, E, S))
@@ -139,7 +139,7 @@ if __name__ == '__main__':
     Name = ''
     chat = ''
     Msg = ''
-    host = "86.191.158.222"
+    host = "127.0.0.1"
     port = 5000
     name = ''
     GM1 = GetMessage()
