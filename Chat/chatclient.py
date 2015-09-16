@@ -24,7 +24,7 @@ class Namer(threading.Thread):
         name = StringVar()
 
         ttk.Button(self.nameframe, text="Confirm name:", command=SetName).grid(column=1, row=1, sticky=(N,W,E, S))
-        Name_entry = ttk.Entry(self.nameframe, width=7, textvariable=name).grid(column=2, row=1, sticky=(N, W, E, S))
+        Name_entry = ttk.Entry(self.nameframe, width=15, textvariable=name).grid(column=2, row=1, sticky=(N, W, E, S))
 
         for child in self.nameframe.winfo_children(): child.grid_configure(padx=5, pady=5)
 
@@ -54,15 +54,15 @@ class GUI(threading.Thread):
 
         chat = StringVar()
         Msg = StringVar()
-
+        Msg.trace('<Return>', SendMessage)
         ttk.Label(self.mainframe, textvariable=chat).grid(column=1, row=1, sticky=(N, W, E, S))
-
+        
         ttk.Button(self.mainframe, text="Send Message:", command=SendMessage).grid(column=1, row=2, sticky=(W, E, S))
         Msg_entry = ttk.Entry(self.mainframe, width=20, textvariable=Msg).grid(column=2, row=2, sticky=(W, E, S))
 
         for child in self.mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
-
-        self.root.bind('<Return>', SendMessage)
+        
+        #self.root.bind('<Return>', SendMessage)
 
         self.root.mainloop()
 
@@ -88,7 +88,12 @@ class GetMessage(threading.Thread):
             chat.set(self.text)
 
 def SendMessage(*args):
-        text = Name + ': ' + Msg.get()
+        Message = Msg.get()
+        if Message:
+            button.config(state='normal')
+        else:
+            button.config(state='disabled')
+        text = Name + ': ' + Message
         print('sending: ' + text)
         s.send(text.encode('utf-8'))
         Msg.set('')
@@ -116,7 +121,6 @@ def SetName(*args):
         print('An error occured in handshaking...restarting')
         Main()
 
- 
                    
 def Main():
     NR1.start()
@@ -125,7 +129,7 @@ if __name__ == '__main__':
     Name = ''
     chat = ''
     Msg = ''
-    host = "192.168.1.66"
+    host = "192.168.1.17"
     port = 5000
     name = ''
     GM1 = GetMessage()
