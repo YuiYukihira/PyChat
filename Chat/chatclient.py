@@ -1,4 +1,4 @@
-import threading, socket
+import threading, socket, random
 from time import sleep
 from tkinter import *
 from tkinter import ttk
@@ -94,10 +94,12 @@ class GetMessage(threading.Thread):
 
 
 def SendMessage(*args):
-    text = Name + ': ' + Msg.get()
-    print('sending: ' + text)
-    s.send(text.encode('utf-8'))
-    Msg.set('')
+    msg = Msg.get()
+    if msg:
+        text = Name + ': ' + msg
+        print('sending: ' + text)
+        s.send(text.encode('utf-8'))
+        Msg.set('')
 
 
 def SetName(*args):
@@ -105,6 +107,8 @@ def SetName(*args):
     s.connect((host, port))
     HndSkMsg = s.recv(1024).decode('utf-8')
     Name = name.get()
+    if not Name:
+        Name = 'NoName {}'.format(random.randint(0,9999999))
     if HndSkMsg == 'NameTime':
         s.send(Name.encode('utf-8'))
         NR1.Quit()
@@ -135,7 +139,7 @@ if __name__ == '__main__':
     Name = ''
     chat = ''
     Msg = ''
-    host = "192.168.1.66"
+    host = "86.191.158.222"
     port = 5000
     name = ''
     GM1 = GetMessage()
