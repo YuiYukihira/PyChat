@@ -1,4 +1,4 @@
-import threading, socket
+import threading, socket, random
 from time import sleep
 from tkinter import *
 from tkinter import ttk
@@ -46,7 +46,6 @@ class GUI(threading.Thread):
         threading.Thread.__init__(self)
         self.root = Tk()
         self.root.title('The PyChat')
-
         self.mainframe = ttk.Frame(self.root, padding='3 3 3 3')
         self.mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
         self.mainframe.columnconfigure(0, weight=1)
@@ -56,15 +55,13 @@ class GUI(threading.Thread):
         Msg = StringVar()
         ttk.Label(self.mainframe, textvariable=chat).grid(column=1, row=1, sticky=(N, W, E, S))
         
-        self.sendbutton = ttk.Button(self.mainframe, text="Send Message:", command=SendMessage, state=DISABLED).grid(column=1, row=2, sticky=(W, E, S))
+        self.sendbutton = ttk.Button(self.mainframe, text="Send Message:", command=SendMessage).grid(column=1, row=2, sticky=(W, E, S))
         Msg_entry = ttk.Entry(self.mainframe, width=20, textvariable=Msg).grid(column=2, row=2, sticky=(W, E, S))
 
         for child in self.mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
         self.root.bind('<Return>', SendMessage)
 
         self.root.mainloop()
-    def validate(self, P)
-        
 
 class NamingError(Exception):
     def __init__(self, name, check):
@@ -88,15 +85,19 @@ class GetMessage(threading.Thread):
             chat.set(self.text)
 
 def SendMessage(*args):
-        text = Name + ': ' + Msg.get()
-        print('sending: ' + text)
-        s.send(text.encode('utf-8'))
-        Msg.set('')
+        msg = Msg.get()
+        if msg:
+            text = Name + ': ' + msg
+            print('sending: ' + text)
+            s.send(text.encode('utf-8'))
+            Msg.set('')
 
 def SetName(*args):
     s.connect((host, port))
     HndSkMsg = s.recv(1024).decode('utf-8')
     Name = name.get()
+    if not Name:
+        Name = 'NoName {}'.format(random.randint(0,9999999)
     if HndSkMsg == 'NameTime':
         s.send(Name.encode('utf-8'))
         NR1.Quit()
