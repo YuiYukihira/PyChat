@@ -12,21 +12,34 @@ def SendData(c, data):
     try:
         c.send(data.encode('utf-8'))
     except ConnectionResetError:
+        ThreadLock1.aquire()
+        ThreadLock2.aquire()
         for i in Clients:
             if Clients[i][1] == c:
                 del Clients[i]
+                break
         c.close()
+        ThreadLock1.release()
+        ThreadLock2.release()
 
 
 def RecvData(c, buffer):
+    print(c)
+    print(Clients)
     try:
         data = c.recv(buffer).decode('utf-8')
         return data
-    except ConnectionResetError:
+    except (ConnectionResetError, OSError):
+        ThreadLock1.acquire()
+        ThreadLock2.acquire()
         for i in Clients:
             if Clients[i][1] == c:
                 del Clients[i]
+                break
         c.close()
+        ThreadLock1.release()
+        ThreadLock2.release()
+
 
 
 class GetConnections(threading.Thread):
@@ -65,6 +78,7 @@ class CreateListeners(threading.Thread):
     def run(self):
         while True:
             try:
+                ThreadLock1.acquire()
                 for i in Clients:
                     if Clients[i][0] == False:
                         Clients[i][0] = True
@@ -74,8 +88,11 @@ class CreateListeners(threading.Thread):
                     if self.c != {}:
                         Listeners[i] = Listener(self.c)
                         Listeners[i].start()
-            except:
+            except RuntimeError:
+                print('Dictionary changed.')
                 self.run()
+            finally:
+                ThreadLock1.release()
 
 
 class PostMessages(threading.Thread):
@@ -86,13 +103,20 @@ class PostMessages(threading.Thread):
     def run(self):
         while True:
             text = ''
-            for i in Listeners:
-                if Listeners[i].posted == False:
-                    text = Listeners[i].text
-                    Listeners[i].posted = True
-            for i in Clients:
-                if text != '':
-                    SendData(Clients[i][1], text)
+            try:
+                ThreadLock2.acquire()
+                for i in Listeners:
+                    if Listeners[i].posted == False:
+                        text = Listeners[i].text
+                        Listeners[i].posted = True
+                for i in Clients:
+                    if text != '':
+                        SendData(Clients[i][1], text)
+            except RuntimeError:
+                print('Dictionary changed.')
+                self.run()
+            finally:
+                ThreadLock2.release()
 
 
 def Main():
@@ -110,7 +134,9 @@ if __name__ == '__main__':
     host = "0.0.0.0"
     port = 5000
     Clients = {}
-    DisconnectionLock = threading.Lock()
+    ThreadLock1 = threading.Lock()
+    ThreadLock2 = threading.Lock()
+    ThreadLock3 = threading.Lock()
     s = socket.socket()
     s.bind((host, port))
     Main()
