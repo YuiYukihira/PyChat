@@ -54,17 +54,17 @@ class GUI(threading.Thread):
 
         chat = StringVar()
         Msg = StringVar()
-        Msg.trace('<Return>', SendMessage)
         ttk.Label(self.mainframe, textvariable=chat).grid(column=1, row=1, sticky=(N, W, E, S))
         
-        ttk.Button(self.mainframe, text="Send Message:", command=SendMessage).grid(column=1, row=2, sticky=(W, E, S))
+        self.sendbutton = ttk.Button(self.mainframe, text="Send Message:", command=SendMessage, state=DISABLED).grid(column=1, row=2, sticky=(W, E, S))
         Msg_entry = ttk.Entry(self.mainframe, width=20, textvariable=Msg).grid(column=2, row=2, sticky=(W, E, S))
 
         for child in self.mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
-        
-        #self.root.bind('<Return>', SendMessage)
+        self.root.bind('<Return>', SendMessage)
 
         self.root.mainloop()
+    def validate(self, P)
+        
 
 class NamingError(Exception):
     def __init__(self, name, check):
@@ -88,12 +88,7 @@ class GetMessage(threading.Thread):
             chat.set(self.text)
 
 def SendMessage(*args):
-        Message = Msg.get()
-        if Message:
-            button.config(state='normal')
-        else:
-            button.config(state='disabled')
-        text = Name + ': ' + Message
+        text = Name + ': ' + Msg.get()
         print('sending: ' + text)
         s.send(text.encode('utf-8'))
         Msg.set('')
