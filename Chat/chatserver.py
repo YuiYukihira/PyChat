@@ -24,11 +24,14 @@ def SendData(c, data):
 
 
 def RecvData(c, buffer):
-    print(c)
-    print(Clients)
+    print('c = {}'.format(c))
+    print('Clients = {}'.format(Clients))
     try:
         data = c.recv(buffer).decode('utf-8')
-        return data
+        if data:
+            return data
+        else:
+            return 'dead'
     except (ConnectionResetError, OSError):
         ThreadLock1.acquire()
         ThreadLock2.acquire()
@@ -63,17 +66,20 @@ class Listener(threading.Thread):
         self.c = c['user']
         self.posted = True
         self.text = ''
-
     def run(self):
         while True:
             self.text = RecvData(self.c, 1024)
-            self.posted = False
-
+            if self.text:
+                if self.text != 'dead':
+                    self.posted = False
+                else: self.posted = 'dead';break
+            else: self.posted = 'dead';break
 
 class CreateListeners(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.c = {}
+        self.kill_list = []
 
     def run(self):
         while True:
@@ -83,11 +89,17 @@ class CreateListeners(threading.Thread):
                     if Clients[i][0] == False:
                         Clients[i][0] = True
                         self.c['user'] = Clients[i][1]
+                    elif Clients[i][0] == 'dead':
+                        print('added to kill list')
+                        self.kill_list.append(i)
                     else:
                         self.c = {}
                     if self.c != {}:
                         Listeners[i] = Listener(self.c)
                         Listeners[i].start()
+                for i in self.kill_list:
+                    del Clients[i]
+                self.kill_list = []
             except RuntimeError:
                 print('Dictionary changed.')
                 self.run()
@@ -120,6 +132,7 @@ class PostMessages(threading.Thread):
 
 
 def Main():
+    kill_list = []
     GConns1 = GetConnections()
     CL1 = CreateListeners()
     PM1 = PostMessages()
