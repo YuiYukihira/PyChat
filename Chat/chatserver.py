@@ -43,8 +43,10 @@ def RecvData(c, buffer):
         ThreadLock1.release()
         ThreadLock2.release()
 
-
-
+def send_to_everyone(data):
+    for i in Clients:
+        try: Clients[i][1].send(data.encode('utf-8'))
+        except: continue
 class GetConnections(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -59,11 +61,11 @@ class GetConnections(threading.Thread):
             self.name = GetName(self.c)
             Clients[self.name] = [False, self.c]
 
-
 class Listener(threading.Thread):
     def __init__(self, c):
         threading.Thread.__init__(self)
         self.c = c['user']
+        self.name = c
         self.posted = True
         self.text = ''
     def run(self):
@@ -72,7 +74,11 @@ class Listener(threading.Thread):
             if self.text:
                 if self.text != 'dead':
                     self.posted = False
-                else: self.posted = 'dead';break
+                else:
+                    self.posted = 'dead'
+                    for i in Clients:
+                        SendData(Clients[i][1], '{} dropped from server'.format(self.name))
+                    break
             else: self.posted = 'dead';break
 
 class CreateListeners(threading.Thread):
@@ -92,6 +98,7 @@ class CreateListeners(threading.Thread):
                     elif Clients[i][0] == 'dead':
                         print('added to kill list')
                         self.kill_list.append(i)
+                        break
                     else:
                         self.c = {}
                     if self.c != {}:
