@@ -101,7 +101,6 @@ def SendMessage(*args):
         s.send(text.encode('utf-8'))
         Msg.set('')
 
-
 def SetName(*args):
     global Name
     s.connect((host, port))
@@ -139,6 +138,7 @@ if __name__ == '__main__':
     Name = ''
     chat = ''
     Msg = ''
+    #host = "10.107.9.67"
     host = "127.0.0.1"
     port = 5000
     name = ''
@@ -147,3 +147,4 @@ if __name__ == '__main__':
     NR1 = Namer()
     s = socket.socket()
     Main()
+
