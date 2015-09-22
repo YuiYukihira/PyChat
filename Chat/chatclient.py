@@ -115,6 +115,7 @@ def SetName(*args):
         if Name == check:
             GUI1.start()
             GM1.start()
+            s.send(('{} has joined the server'.format(Name)).encode('utf-8'))
         else:
             try:
                 raise NamingError(name, check)
@@ -125,6 +126,7 @@ def SetName(*args):
                 sleep(5)
                 print('restarting')
                 Main()
+        
     else:
         print('An error occurred in handshaking...restarting')
         Main()
