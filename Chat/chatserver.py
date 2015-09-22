@@ -28,10 +28,7 @@ def RecvData(c, buffer):
     print('Clients = {}'.format(Clients))
     try:
         data = c.recv(buffer).decode('utf-8')
-        if data:
-            return data
-        else:
-            return 'dead'
+        return data
     except (ConnectionResetError, OSError):
         ThreadLock1.acquire()
         ThreadLock2.acquire()
@@ -43,10 +40,6 @@ def RecvData(c, buffer):
         ThreadLock1.release()
         ThreadLock2.release()
 
-def send_to_everyone(data):
-    for i in Clients:
-        try: Clients[i][1].send(data.encode('utf-8'))
-        except: continue
 class GetConnections(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -72,14 +65,8 @@ class Listener(threading.Thread):
         while True:
             self.text = RecvData(self.c, 1024)
             if self.text:
-                if self.text != 'dead':
-                    self.posted = False
-                else:
-                    self.posted = 'dead'
-                    for i in Clients:
-                        SendData(Clients[i][1], '{} dropped from server'.format(self.name))
-                    break
-            else: self.posted = 'dead';break
+                self.posted = False
+            else: self.posted = False;self.text = 'user has left the server';break
 
 class CreateListeners(threading.Thread):
     def __init__(self):
@@ -95,18 +82,11 @@ class CreateListeners(threading.Thread):
                     if Clients[i][0] == False:
                         Clients[i][0] = True
                         self.c['user'] = Clients[i][1]
-                    elif Clients[i][0] == 'dead':
-                        print('added to kill list')
-                        self.kill_list.append(i)
-                        break
                     else:
                         self.c = {}
                     if self.c != {}:
                         Listeners[i] = Listener(self.c)
                         Listeners[i].start()
-                for i in self.kill_list:
-                    del Clients[i]
-                self.kill_list = []
             except RuntimeError:
                 print('Dictionary changed.')
                 self.run()
