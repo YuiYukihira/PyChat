@@ -48,19 +48,20 @@ class GUI(threading.Thread):
         threading.Thread.__init__(self)
         self.root = Tk()
         self.root.title('The PyChat')
-
+        self.root.geometry('400x600')
+        
         self.mainframe = ttk.Frame(self.root, padding='3 3 3 3')
-        self.mainframe.grid(column=0, row=0, sticky=(N, W, E, S))
-        self.mainframe.columnconfigure(0, weight=1)
-        self.mainframe.rowconfigure(0, weight=1)
+        self.mainframe.grid(sticky=(N, W, E, S))
+        self.mainframe.pack(fill=BOTH, expand=1)
+        self.sendframe = ttk.Frame(self.root, relief=RAISED, borderwidth=1)
+        self.sendframe.pack(fill=BOTH, expand=0)
 
         chat = StringVar()
         Msg = StringVar()
-
-        ttk.Label(self.mainframe, textvariable=chat, wraplength=500).grid(column=1, row=1, sticky=(N, W, E, S))
-
-        ttk.Button(self.mainframe, text="Send Message:", command=SendMessage).grid(column=1, row=2, sticky=(W, E, S))
-        Msg_entry = ttk.Entry(self.mainframe, width=20, textvariable=Msg).grid(column=2, row=2, sticky=(W, E, S))
+        ttk.Label(self.mainframe, textvariable=chat, wraplength=380, anchor='nw',text="Top Left").grid(sticky=(N, W, E, S))
+        Msg_entry = ttk.Entry(self.sendframe, width=20, textvariable=Msg).grid(column=0, row=0, sticky=(W, E, S))
+        ttk.Button(self.sendframe, text="Send Message:", command=SendMessage).grid(column=1, row=0, sticky=(W, S))
+        
 
         for child in self.mainframe.winfo_children(): child.grid_configure(padx=5, pady=5)
 
@@ -82,12 +83,18 @@ class GetMessage(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.text = ''
+        self.list = []
 
     def run(self):
         while True:
             sleep(0.1)
             try:
-                self.text += s.recv(1024).decode('utf-8') + '\n'
+                self.text = s.recv(1024).decode('utf-8')
+                for i in range((len(self.text)//80)+1):
+                    self.list.append((self.text[i*80:(i+1)*80]+'\n'))
+                self.list = self.list[-37:len(self.list)]
+                self.text = ''
+                self.text = self.text.join(str(x) for x in self.list)
             except:
                 sleep(0.1)
             chat.set(self.text)
@@ -149,4 +156,3 @@ if __name__ == '__main__':
     NR1 = Namer()
     s = socket.socket()
     Main()
-
