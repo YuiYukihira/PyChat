@@ -48,7 +48,7 @@ class GUI(threading.Thread):
         threading.Thread.__init__(self)
         self.root = Tk()
         self.root.title('The PyChat')
-        self.root.geometry('400x600')
+        self.root.geometry('400x620')
         
         self.mainframe = ttk.Frame(self.root, padding='3 3 3 3')
         self.mainframe.grid(sticky=(N, W, E, S))
