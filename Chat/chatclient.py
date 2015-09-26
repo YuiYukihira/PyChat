@@ -3,7 +3,7 @@ from time import sleep
 from tkinter import *
 from tkinter import ttk
 
-
+# Define the GUI used for inputing the user's name.
 class Namer(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -33,7 +33,7 @@ class Namer(threading.Thread):
 
         self.namer.mainloop()
 
-
+# Define chat GUI.
 class GUI(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -69,7 +69,7 @@ class GUI(threading.Thread):
 
         self.root.mainloop()
 
-
+# Define NamingError
 class NamingError(Exception):
     def __init__(self, name, check):
         self.name = name
@@ -78,7 +78,7 @@ class NamingError(Exception):
     def __str__(self):
         return repr(self.name), repr(self.check)
 
-
+# Define the GetMessage class.
 class GetMessage(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
@@ -99,7 +99,7 @@ class GetMessage(threading.Thread):
                 sleep(0.1)
             chat.set(self.text)
 
-
+# Define SendMessage function.
 def SendMessage(*args):
     msg = Msg.get()
     if msg:
@@ -108,12 +108,14 @@ def SendMessage(*args):
         s.send(text.encode('utf-8'))
         Msg.set('')
 
+# Define SetName function.
 def SetName(*args):
     global Name
     s.connect((host, port))
     HndSkMsg = s.recv(1024).decode('utf-8')
     Name = name.get()
     if not Name:
+        # If th user did not input a name, create a random one.
         Name = 'NoName {}'.format(random.randint(0,9999999))
     if HndSkMsg == 'NameTime':
         s.send(Name.encode('utf-8'))
