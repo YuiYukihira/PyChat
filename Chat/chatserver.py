@@ -79,6 +79,7 @@ class CreateListeners(threading.Thread):
         while True:
             try:
                 ThreadLock1.acquire()
+                ThreadLock2.acquire()
                 for i in Clients:
                     if Clients[i][0] == False:
                         Clients[i][0] = True
@@ -93,6 +94,7 @@ class CreateListeners(threading.Thread):
                 self.run()
             finally:
                 ThreadLock1.release()
+                ThreadLock2.release()
 
 
 class PostMessages(threading.Thread):
@@ -111,7 +113,8 @@ class PostMessages(threading.Thread):
                         Listeners[i].posted = True
                 for i in Clients:
                     if text != '':
-                        SendData(Clients[i][1], text)
+                        if len(text) < 1024:
+                            SendData(Clients[i][1], text)
             except RuntimeError:
                 print('Dictionary changed. at PostMessages')
                 self.run()
