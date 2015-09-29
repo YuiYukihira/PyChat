@@ -58,7 +58,7 @@ class GUI(threading.Thread):
 
         chat = StringVar()
         Msg = StringVar()
-        ttk.Label(self.mainframe, textvariable=chat, wraplength=380, anchor='nw',text="Top Left").grid(sticky=(N, W, E, S))
+        ttk.Label(self.mainframe, textvariable=chat, anchor='nw',text="Top Left").grid(sticky=(N, W, E, S))
         Msg_entry = ttk.Entry(self.sendframe, width=20, textvariable=Msg).grid(column=0, row=0, sticky=(W, E, S))
         ttk.Button(self.sendframe, text="Send Message:", command=SendMessage).grid(column=1, row=0, sticky=(W, S))
         
@@ -89,24 +89,28 @@ class GetMessage(threading.Thread):
         while True:
             sleep(0.1)
             try:
-                self.text = s.recv(1024).decode('utf-8')
-                for i in range((len(self.text)//80)+1):
-                    self.list.append((self.text[i*80:(i+1)*80]+'\n'))
+                chattext = s.recv(1024).decode('utf-8')
+                print(len(chattext))
+                for i in range((len(chattext)//70)+1):
+                    self.list.append((chattext[i*70:(i+1)*70]+'\n'))
                 self.list = self.list[-37:len(self.list)]
-                self.text = ''
-                self.text = self.text.join(str(x) for x in self.list)
+                print(len(self.list))
+                chattext = ''
+                chattext = chattext.join(str(x) for x in self.list)
             except:
                 sleep(0.1)
-            chat.set(self.text)
+            chat.set(chattext)
 
 
 def SendMessage(*args):
     msg = Msg.get()
     if msg:
-        text = Name + ': ' + msg
-        print('sending: ' + text)
-        s.send(text.encode('utf-8'))
-        Msg.set('')
+        if len(msg) < 1024:
+            text = Name + ': ' + msg
+            print('sending: ' + text)
+            s.send(text.encode('utf-8'))
+            Msg.set('')
+        else: print('message over limit, not sending')
 
 def SetName(*args):
     global Name
@@ -147,7 +151,7 @@ if __name__ == '__main__':
     Name = ''
     chat = ''
     Msg = ''
-    #host = "10.107.9.67"
+    #host = "10.107.9."
     host = "127.0.0.1"
     port = 5000
     name = ''
